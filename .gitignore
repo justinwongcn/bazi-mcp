@@ -1,0 +1,25 @@
+# 忽略构建脚本
+/build.sh
+
+# 忽略构建输出目录
+/dist/
+
+# 忽略文档目录
+/docs/
+
+# 忽略IDE配置文件
+.idea/
+.vscode/
+
+# 忽略Go编译输出
+*.exe
+*.test
+*.prof
+
+# 忽略操作系统生成的文件
+.DS_Store
+Thumbs.db
+
+# 忽略Go模块下载目录
+/bin/
+/pkg/

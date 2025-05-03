@@ -1,0 +1,63 @@
+name: Multi-Platform Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            name: "Linux Debian"
+            goos: "linux"
+            goarch: "amd64"
+            artifact: "bazi-mcp-linux-amd64"
+          - os: macos-latest
+            name: "Mac Intel"
+            goos: "darwin"
+            goarch: "amd64"
+            artifact: "bazi-mcp-mac-intel"
+          - os: macos-latest
+            name: "Mac Apple Silicon"
+            goos: "darwin"
+            goarch: "arm64"
+            artifact: "bazi-mcp-mac-apple"
+          - os: windows-latest
+            name: "Windows 64"
+            goos: "windows"
+            goarch: "amd64"
+            artifact: "bazi-mcp-windows-amd64.exe"
+          - os: ubuntu-latest
+            name: "Linux CentOS"
+            goos: "linux"
+            goarch: "amd64"
+            artifact: "bazi-mcp-linux-centos"
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.20'
+    
+    - name: Build
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+      run: |
+        cd cmd/bazi-mcp
+        go build -v -o ${{ matrix.artifact }} ./...
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.artifact }}
+        path: cmd/bazi-mcp/${{ matrix.artifact }}
