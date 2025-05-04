@@ -32,7 +32,7 @@ func NewAPIClient() *APIClient {
 }
 
 // GetPaipanResult 调用外部 API 获取八字排盘结果。
-func (c *APIClient) GetPaipanResult(ctx context.Context, req bazi.BaziRequest) (*bazi.BaziResponse, error) {
+func (c *APIClient) GetPaipanResult(ctx context.Context, req bazi.Request) (*bazi.PaipanResponse, error) {
 	formData := c.buildFormData(req)
 
 	body, err := c.makeAPIRequest(ctx, "/paipan", formData)
@@ -40,20 +40,20 @@ func (c *APIClient) GetPaipanResult(ctx context.Context, req bazi.BaziRequest) (
 		return nil, err
 	}
 
-	var baziResp bazi.BaziResponse
+	var baziResp bazi.PaipanResponse
 	if err := json.Unmarshal(body, &baziResp); err != nil {
 		// 如果解析失败，仍然尝试返回原始 body 以便调试
 		return nil, fmt.Errorf("解析API响应失败: %w, 原始响应: %s", err, string(body))
 	}
 
-	// 将原始响应体也放入 BaziResponse 中，以便应用层可以格式化
+	// 将原始响应体也放入 PaipanResponse 中，以便应用层可以格式化
 	if baziResp.ErrCode == 0 {
 		// 为了能在应用层访问原始数据进行格式化，这里需要一种方式传递原始 body
 		// 暂时直接在成功时也返回原始 body，应用层需要检查 ErrCode
-		// 或者修改 BaziResponse 结构添加一个字段存储原始 JSON
+		// 或者修改 PaipanResponse 结构添加一个字段存储原始 JSON
 		// 这里为了简单，先假设应用层能处理
-		// 更好的做法是修改 BaziResponse 结构
-		// type BaziResponse struct {
+		// 更好的做法是修改 PaipanResponse 结构
+		// type PaipanResponse struct {
 		// 	 ErrCode int             `json:"errcode"`
 		// 	 ErrMsg  string          `json:"errmsg"`
 		// 	 Notice  string          `json:"notice"`
@@ -89,7 +89,7 @@ func (c *APIClient) makeAPIRequest(ctx context.Context, path string, formData ur
 }
 
 // buildFormData 构建API请求的表单数据
-func (c *APIClient) buildFormData(req bazi.BaziRequest) url.Values {
+func (c *APIClient) buildFormData(req bazi.Request) url.Values {
 	formData := url.Values{}
 	formData.Set("api_key", c.apiKey)
 	formData.Set("name", req.Name)
@@ -100,13 +100,15 @@ func (c *APIClient) buildFormData(req bazi.BaziRequest) url.Values {
 	formData.Set("day", strconv.Itoa(req.Day))
 	formData.Set("hours", strconv.Itoa(req.Hours))
 	formData.Set("minute", strconv.Itoa(req.Minute))
+	formData.Set("zhen", strconv.Itoa(req.Zhen))
+	formData.Set("sect", strconv.Itoa(req.Sect))
 
-	if req.Sect > 0 {
-		formData.Set("sect", strconv.Itoa(req.Sect))
+	if req.Name != "" {
+		formData.Set("name", req.Name)
+	} else {
+		formData.Set("name", "求测者")
 	}
-	if req.Zhen > 0 {
-		formData.Set("zhen", strconv.Itoa(req.Zhen))
-	}
+
 	if req.Province != "" {
 		formData.Set("province", req.Province)
 	}

@@ -1,0 +1,674 @@
+{
+  "errcode": 0,
+  "errmsg": "请求成功",
+  "notice": "本次测算结果仅供娱乐使用，请勿用于封建迷信和违法用途。",
+  "data": {
+    "base_info": {
+      "sex": "乾造",
+      "name": "张三",
+      "gongli": "2000年1月2日3时4分",
+      "nongli": "己卯年 十一月 廿六日 寅时",
+      "qiyun": "8年4月26天起运",
+      "jiaoyun": "2008年4月15日11时50分26秒",
+      "zhengge": "偏财格"
+    },
+    "bazi_info": {
+      "kw": "子丑",
+      "tg_cg_god": [
+        "比肩",
+        "正印",
+        "日元",
+        "正印"
+      ],
+      "bazi": [
+        "己卯",
+        "丙子",
+        "己未",
+        "丙寅"
+      ],
+      "dz_cg": [
+        "乙",
+        "癸",
+        "己|丁|乙",
+        "甲|丙|戊"
+      ],
+      "dz_cg_god": [
+        "七杀",
+        "偏财",
+        "比肩|偏印|七杀",
+        "正官|正印|劫财"
+      ],
+      "day_cs": [
+        "病",
+        "绝",
+        "冠带",
+        "死"
+      ],
+      "na_yin": [
+        "城头土",
+        "涧下水",
+        "天上火",
+        "炉中火"
+      ]
+    },
+    "dayun_info": {
+      "big_god": [
+        "七杀",
+        "正官",
+        "偏财",
+        "正财",
+        "食神",
+        "伤官",
+        "比肩",
+        "劫财",
+        "偏印",
+        "正印",
+        "七杀",
+        "正官"
+      ],
+      "big": [
+        "乙亥",
+        "甲戌",
+        "癸酉",
+        "壬申",
+        "辛未",
+        "庚午",
+        "己巳",
+        "戊辰",
+        "丁卯",
+        "丙寅",
+        "乙丑",
+        "甲子"
+      ],
+      "big_cs": [
+        "胎",
+        "养",
+        "长生",
+        "沐浴",
+        "冠带",
+        "临官",
+        "帝旺",
+        "衰",
+        "病",
+        "死",
+        "墓",
+        "绝"
+      ],
+      "xu_sui": [
+        9,
+        19,
+        29,
+        39,
+        49,
+        59,
+        69,
+        79,
+        89,
+        99,
+        109,
+        119
+      ],
+      "big_start_year": [
+        2008,
+        2018,
+        2028,
+        2038,
+        2048,
+        2058,
+        2068,
+        2078,
+        2088,
+        2098,
+        2108,
+        2118
+      ],
+      "big_start_year_liu_nian": "",
+      "big_end_year": [
+        2017,
+        2027,
+        2037,
+        2047,
+        2057,
+        2067,
+        2077,
+        2087,
+        2097,
+        2107,
+        2117,
+        2127
+      ],
+      "years_info0": [
+        {
+          "year_char": "丁亥"
+        },
+        {
+          "year_char": "丁酉"
+        },
+        {
+          "year_char": "丁未"
+        },
+        {
+          "year_char": "丁巳"
+        },
+        {
+          "year_char": "丁卯"
+        },
+        {
+          "year_char": "丁丑"
+        },
+        {
+          "year_char": "丁亥"
+        },
+        {
+          "year_char": "丁酉"
+        },
+        {
+          "year_char": "丁未"
+        },
+        {
+          "year_char": "丁巳"
+        },
+        {
+          "year_char": "丁卯"
+        },
+        {
+          "year_char": "丁丑"
+        }
+      ],
+      "years_info1": [
+        {
+          "year_char": "戊子"
+        },
+        {
+          "year_char": "戊戌"
+        },
+        {
+          "year_char": "戊申"
+        },
+        {
+          "year_char": "戊午"
+        },
+        {
+          "year_char": "戊辰"
+        },
+        {
+          "year_char": "戊寅"
+        },
+        {
+          "year_char": "戊子"
+        },
+        {
+          "year_char": "戊戌"
+        },
+        {
+          "year_char": "戊申"
+        },
+        {
+          "year_char": "戊午"
+        },
+        {
+          "year_char": "戊辰"
+        },
+        {
+          "year_char": "戊寅"
+        }
+      ],
+      "years_info2": [
+        {
+          "year_char": "己丑"
+        },
+        {
+          "year_char": "己亥"
+        },
+        {
+          "year_char": "己酉"
+        },
+        {
+          "year_char": "己未"
+        },
+        {
+          "year_char": "己巳"
+        },
+        {
+          "year_char": "己卯"
+        },
+        {
+          "year_char": "己丑"
+        },
+        {
+          "year_char": "己亥"
+        },
+        {
+          "year_char": "己酉"
+        },
+        {
+          "year_char": "己未"
+        },
+        {
+          "year_char": "己巳"
+        },
+        {
+          "year_char": "己卯"
+        }
+      ],
+      "years_info3": [
+        {
+          "year_char": "庚寅"
+        },
+        {
+          "year_char": "庚子"
+        },
+        {
+          "year_char": "庚戌"
+        },
+        {
+          "year_char": "庚申"
+        },
+        {
+          "year_char": "庚午"
+        },
+        {
+          "year_char": "庚辰"
+        },
+        {
+          "year_char": "庚寅"
+        },
+        {
+          "year_char": "庚子"
+        },
+        {
+          "year_char": "庚戌"
+        },
+        {
+          "year_char": "庚申"
+        },
+        {
+          "year_char": "庚午"
+        },
+        {
+          "year_char": "庚辰"
+        }
+      ],
+      "years_info4": [
+        {
+          "year_char": "辛卯"
+        },
+        {
+          "year_char": "辛丑"
+        },
+        {
+          "year_char": "辛亥"
+        },
+        {
+          "year_char": "辛酉"
+        },
+        {
+          "year_char": "辛未"
+        },
+        {
+          "year_char": "辛巳"
+        },
+        {
+          "year_char": "辛卯"
+        },
+        {
+          "year_char": "辛丑"
+        },
+        {
+          "year_char": "辛亥"
+        },
+        {
+          "year_char": "辛酉"
+        },
+        {
+          "year_char": "辛未"
+        },
+        {
+          "year_char": "辛巳"
+        }
+      ],
+      "years_info5": [
+        {
+          "year_char": "壬辰"
+        },
+        {
+          "year_char": "壬寅"
+        },
+        {
+          "year_char": "壬子"
+        },
+        {
+          "year_char": "壬戌"
+        },
+        {
+          "year_char": "壬申"
+        },
+        {
+          "year_char": "壬午"
+        },
+        {
+          "year_char": "壬辰"
+        },
+        {
+          "year_char": "壬寅"
+        },
+        {
+          "year_char": "壬子"
+        },
+        {
+          "year_char": "壬戌"
+        },
+        {
+          "year_char": "壬申"
+        },
+        {
+          "year_char": "壬午"
+        }
+      ],
+      "years_info6": [
+        {
+          "year_char": "癸巳"
+        },
+        {
+          "year_char": "癸卯"
+        },
+        {
+          "year_char": "癸丑"
+        },
+        {
+          "year_char": "癸亥"
+        },
+        {
+          "year_char": "癸酉"
+        },
+        {
+          "year_char": "癸未"
+        },
+        {
+          "year_char": "癸巳"
+        },
+        {
+          "year_char": "癸卯"
+        },
+        {
+          "year_char": "癸丑"
+        },
+        {
+          "year_char": "癸亥"
+        },
+        {
+          "year_char": "癸酉"
+        },
+        {
+          "year_char": "癸未"
+        }
+      ],
+      "years_info7": [
+        {
+          "year_char": "甲午"
+        },
+        {
+          "year_char": "甲辰"
+        },
+        {
+          "year_char": "甲寅"
+        },
+        {
+          "year_char": "甲子"
+        },
+        {
+          "year_char": "甲戌"
+        },
+        {
+          "year_char": "甲申"
+        },
+        {
+          "year_char": "甲午"
+        },
+        {
+          "year_char": "甲辰"
+        },
+        {
+          "year_char": "甲寅"
+        },
+        {
+          "year_char": "甲子"
+        },
+        {
+          "year_char": "甲戌"
+        },
+        {
+          "year_char": "甲申"
+        }
+      ],
+      "years_info8": [
+        {
+          "year_char": "乙未"
+        },
+        {
+          "year_char": "乙巳"
+        },
+        {
+          "year_char": "乙卯"
+        },
+        {
+          "year_char": "乙丑"
+        },
+        {
+          "year_char": "乙亥"
+        },
+        {
+          "year_char": "乙酉"
+        },
+        {
+          "year_char": "乙未"
+        },
+        {
+          "year_char": "乙巳"
+        },
+        {
+          "year_char": "乙卯"
+        },
+        {
+          "year_char": "乙丑"
+        },
+        {
+          "year_char": "乙亥"
+        },
+        {
+          "year_char": "乙酉"
+        }
+      ],
+      "years_info9": [
+        {
+          "year_char": "丙申"
+        },
+        {
+          "year_char": "丙午"
+        },
+        {
+          "year_char": "丙辰"
+        },
+        {
+          "year_char": "丙寅"
+        },
+        {
+          "year_char": "丙子"
+        },
+        {
+          "year_char": "丙戌"
+        },
+        {
+          "year_char": "丙申"
+        },
+        {
+          "year_char": "丙午"
+        },
+        {
+          "year_char": "丙辰"
+        },
+        {
+          "year_char": "丙寅"
+        },
+        {
+          "year_char": "丙子"
+        },
+        {
+          "year_char": "丙戌"
+        }
+      ]
+    },
+    "start_info": {
+      "jishen": [
+        "将星 进神",
+        "空亡 天乙贵人 红鸾 桃花",
+        "太极贵人 福星贵人 华盖 童子 福德 六秀",
+        "国印贵人 亡神"
+      ],
+      "xz": "摩羯座",
+      "sx": "兔"
+    },
+    "detail_info": {
+      "zhuxing": {
+        "year": "比肩",
+        "month": "正印",
+        "day": "日元",
+        "hour": "正印"
+      },
+      "sizhu": {
+        "year": {
+          "tg": "己",
+          "dz": "卯"
+        },
+        "month": {
+          "tg": "丙",
+          "dz": "子"
+        },
+        "day": {
+          "tg": "己",
+          "dz": "未"
+        },
+        "hour": {
+          "tg": "丙",
+          "dz": "寅"
+        }
+      },
+      "canggan": {
+        "year": [
+          "乙"
+        ],
+        "month": [
+          "癸"
+        ],
+        "day": [
+          "己",
+          "丁",
+          "乙"
+        ],
+        "hour": [
+          "甲",
+          "丙",
+          "戊"
+        ]
+      },
+      "fuxing": {
+        "year": [
+          "七杀"
+        ],
+        "month": [
+          "偏财"
+        ],
+        "day": [
+          "比肩",
+          "偏印",
+          "七杀"
+        ],
+        "hour": [
+          "正官",
+          "正印",
+          "劫财"
+        ]
+      },
+      "xingyun": {
+        "year": "病",
+        "month": "绝",
+        "day": "冠带",
+        "hour": "死"
+      },
+      "zizuo": {
+        "year": "病",
+        "month": "胎",
+        "day": "冠带",
+        "hour": "长生"
+      },
+      "kongwang": {
+        "year": "申酉",
+        "month": "申酉",
+        "day": "子丑",
+        "hour": "戌亥"
+      },
+      "nayin": {
+        "year": "城头土",
+        "month": "涧下水",
+        "day": "天上火",
+        "hour": "炉中火"
+      },
+      "shensha": {
+        "year": "将星 进神",
+        "month": "空亡 天乙贵人 红鸾 桃花",
+        "day": "太极贵人 福星贵人 华盖 童子 福德 六秀",
+        "hour": "国印贵人 亡神"
+      },
+      "dayunshensha": [
+        {
+          "tgdz": "乙亥",
+          "shensha": "天医 国印贵人 "
+        },
+        {
+          "tgdz": "甲戌",
+          "shensha": "太极贵人 国印贵人 "
+        },
+        {
+          "tgdz": "癸酉",
+          "shensha": "文昌贵人 干禄 "
+        },
+        {
+          "tgdz": "壬申",
+          "shensha": "天乙贵人 金舆 天厨贵人 劫煞 "
+        },
+        {
+          "tgdz": "辛未",
+          "shensha": "太极贵人 华盖 "
+        },
+        {
+          "tgdz": "庚午",
+          "shensha": "天乙贵人 禄神 福星贵人 流霞 "
+        },
+        {
+          "tgdz": "己巳",
+          "shensha": "天德贵人 驿马 "
+        },
+        {
+          "tgdz": "戊辰",
+          "shensha": "太极贵人 红艳 日德 "
+        },
+        {
+          "tgdz": "丁卯",
+          "shensha": "太极贵人 月德贵人 将星 "
+        },
+        {
+          "tgdz": "丙寅",
+          "shensha": "福星贵人 国印贵人 亡神 "
+        },
+        {
+          "tgdz": "乙丑",
+          "shensha": "空亡 太极贵人 福星贵人 "
+        },
+        {
+          "tgdz": "甲子",
+          "shensha": "空亡 天乙贵人 太极贵人 福星贵人 桃花 进神 "
+        }
+      ]
+    }
+  }
+}

@@ -54,7 +54,7 @@ jobs:
         GOARCH: ${{ matrix.goarch }}
       run: |
         cd cmd/bazi-mcp
-        go build -v -o ${{ matrix.artifact }} ./...
+        go build -v -ldflags "-X main.transport=stdio" -o ${{ matrix.artifact }} ./...
     
     - name: Upload artifact
       uses: actions/upload-artifact@v3
