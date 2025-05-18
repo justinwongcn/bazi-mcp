@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"log"
 
-	app "github.com/john/bazi-mcp/internal/application"
-	baziDomain "github.com/john/bazi-mcp/internal/domain/bazi"
-	"github.com/john/bazi-mcp/internal/domain/location"
-	baziInfra "github.com/john/bazi-mcp/internal/infrastructure/bazi"
+	app "github.com/justinwongcn/bazi-mcp/internal/application"
+	baziDomain "github.com/justinwongcn/bazi-mcp/internal/domain/bazi"
+	"github.com/justinwongcn/bazi-mcp/internal/domain/location"
+	baziInfra "github.com/justinwongcn/bazi-mcp/internal/infrastructure/bazi"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
 	"github.com/ThinkInAIXYZ/go-mcp/server"
@@ -51,61 +51,77 @@ func main() {
 
 // registerLocationResources 注册省份和城市相关的 MCP 资源。
 func registerLocationResources(mcpServer *server.Server) error {
-	// 注册省份资源
-	mcpServer.RegisterResource(&protocol.Resource{
-		Name:        "可用省份列表",
+	// 注册所有省份列表的资源
+	provincesResource := &protocol.Resource{
 		URI:         "data://provinces",
-		Description: "八字排盘可用的省份列表",
+		Name:        "所有支持的省份",
+		Description: "列出所有支持的省份列表",
 		MimeType:    "application/json",
-	}, func(ctx context.Context, req *protocol.ReadResourceRequest) (*protocol.ReadResourceResult, error) {
-		provincesJSON, _ := json.Marshal(location.Provinces)
+	}
+
+	mcpServer.RegisterResource(provincesResource, func(ctx context.Context, req *protocol.ReadResourceRequest) (*protocol.ReadResourceResult, error) {
+		// 获取省份列表
+		provinces := location.Provinces
+
+		// 将省份列表转换为JSON
+		provincesJSON, err := json.Marshal(provinces)
+		if err != nil {
+			return nil, fmt.Errorf("序列化省份列表失败: %w", err)
+		}
+
 		return &protocol.ReadResourceResult{
 			Contents: []protocol.ResourceContents{
 				protocol.TextResourceContents{
-					URI:      "data://provinces",
-					MimeType: "application/json",
+					URI:      provincesResource.URI,
+					MimeType: provincesResource.MimeType,
 					Text:     string(provincesJSON),
 				},
 			},
 		}, nil
 	})
 
-	// 注册城市资源模板
-	err := mcpServer.RegisterResourceTemplate(&protocol.ResourceTemplate{
-		Name:        "省份城市查询",
+	// 注册资源模板，用于查询特定省份的城市列表
+	cityResourceTemplate := &protocol.ResourceTemplate{
 		URITemplate: "data://cities/{province}",
-		Description: "根据省份查询城市列表",
-	}, func(ctx context.Context, req *protocol.ReadResourceRequest) (*protocol.ReadResourceResult, error) {
+		Name:        "省份城市列表",
+		Description: "查询特定省份下的城市列表",
+		MimeType:    "application/json",
+	}
+
+	err := mcpServer.RegisterResourceTemplate(cityResourceTemplate, func(ctx context.Context, req *protocol.ReadResourceRequest) (*protocol.ReadResourceResult, error) {
 		province, ok := req.Arguments["province"].(string)
-		if !ok || province == "" {
-			return nil, fmt.Errorf("未提供有效的省份参数")
+		if !ok {
+			return nil, fmt.Errorf("未提供省份参数或参数类型不正确")
 		}
 
-		citiesList, found := location.Cities[province]
-		if !found {
-			// 即使省份在 Provinces 列表中，也可能没有对应的城市数据（数据不完整）
-			// 或者省份本身就不在 Provinces 列表中
-			if !location.IsValidProvince(province) {
-				return nil, fmt.Errorf("无效的省份: %s", province)
-			} else {
-				// 省份有效，但无城市数据
-				return nil, fmt.Errorf("未找到省份 '%s' 对应的城市列表数据", province)
-			}
+		// 查找省份对应的城市列表
+		cities, ok := location.Cities[province]
+		if !ok {
+			return nil, fmt.Errorf("不支持的省份: %s", province)
 		}
 
-		citiesJSON, _ := json.Marshal(citiesList)
+		// 将城市列表转换为JSON
+		citiesJSON, err := json.Marshal(cities)
+		if err != nil {
+			return nil, fmt.Errorf("序列化城市列表失败: %w", err)
+		}
+
 		return &protocol.ReadResourceResult{
 			Contents: []protocol.ResourceContents{
 				protocol.TextResourceContents{
-					URI:      fmt.Sprintf("data://cities/%s", province),
-					MimeType: "application/json",
+					URI:      req.URI, // 使用请求的URI，因为它包含了具体的省份
+					MimeType: cityResourceTemplate.MimeType,
 					Text:     string(citiesJSON),
 				},
 			},
 		}, nil
 	})
 
-	return err
+	if err != nil {
+		return fmt.Errorf("注册城市资源模板失败: %w", err)
+	}
+
+	return nil
 }
 
 // registerBaziTool 注册八字排盘工具及其处理程序。

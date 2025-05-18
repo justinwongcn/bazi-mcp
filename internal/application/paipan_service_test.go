@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/john/bazi-mcp/internal/domain/bazi"
+	"github.com/justinwongcn/bazi-mcp/internal/domain/bazi"
 )
 
 func loadTestData(t *testing.T) *bazi.PaipanResponse {

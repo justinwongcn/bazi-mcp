@@ -1,7 +1,6 @@
 package bazi
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -12,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/john/bazi-mcp/internal/domain/bazi"
+	"github.com/justinwongcn/bazi-mcp/internal/domain/bazi"
 )
 
 const (
@@ -44,23 +43,6 @@ func (c *APIClient) GetPaipanResult(ctx context.Context, req bazi.Request) (*baz
 	if err := json.Unmarshal(body, &baziResp); err != nil {
 		// 如果解析失败，仍然尝试返回原始 body 以便调试
 		return nil, fmt.Errorf("解析API响应失败: %w, 原始响应: %s", err, string(body))
-	}
-
-	// 将原始响应体也放入 PaipanResponse 中，以便应用层可以格式化
-	if baziResp.ErrCode == 0 {
-		// 为了能在应用层访问原始数据进行格式化，这里需要一种方式传递原始 body
-		// 暂时直接在成功时也返回原始 body，应用层需要检查 ErrCode
-		// 或者修改 PaipanResponse 结构添加一个字段存储原始 JSON
-		// 这里为了简单，先假设应用层能处理
-		// 更好的做法是修改 PaipanResponse 结构
-		// type PaipanResponse struct {
-		// 	 ErrCode int             `json:"errcode"`
-		// 	 ErrMsg  string          `json:"errmsg"`
-		// 	 Notice  string          `json:"notice"`
-		// 	 Data    json.RawMessage `json:"data"`
-		// 	 RawBody json.RawMessage `json:"-"` // Non-exported field to hold raw body
-		// }
-		// baziResp.RawBody = body
 	}
 
 	return &baziResp, nil
@@ -120,15 +102,4 @@ func (c *APIClient) buildFormData(req bazi.Request) url.Values {
 	}
 
 	return formData
-}
-
-// FormatBaziResponse 格式化八字排盘的 JSON 响应。
-// 这个函数可以移到应用层或者表示层，这里暂时放在 infrastructure
-// 因为它紧密关联 APIClient 返回的数据结构。
-func FormatBaziResponse(rawBody []byte) (string, error) {
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, rawBody, "", "  "); err != nil {
-		return "", fmt.Errorf("格式化JSON失败: %w", err)
-	}
-	return prettyJSON.String(), nil
 }

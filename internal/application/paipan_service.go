@@ -6,8 +6,8 @@ import (
 	"strconv" // 添加 strconv 包
 	"strings"
 
-	"github.com/john/bazi-mcp/internal/domain/bazi"
-	"github.com/john/bazi-mcp/internal/domain/location"
+	"github.com/justinwongcn/bazi-mcp/internal/domain/bazi"
+	"github.com/justinwongcn/bazi-mcp/internal/domain/location"
 )
 
 var pillars = []string{"年", "月", "日", "时"}
