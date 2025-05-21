@@ -15,7 +15,7 @@
 
 ## API 地址
 
-[网址](https://doc.yuanfenju.com)
+[缘分居](https://doc.yuanfenju.com)
 
 ## 构建方式
 
