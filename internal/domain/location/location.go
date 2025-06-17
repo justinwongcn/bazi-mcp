@@ -1,6 +1,73 @@
 package location
 
-import "slices"
+import (
+	"github.com/adrg/strutil"
+	"github.com/adrg/strutil/metrics"
+	"github.com/mozillazg/go-pinyin"
+	"slices"
+)
+
+// ConvertToPinyin 将中文转换为拼音
+func ConvertToPinyin(s string) string {
+	args := pinyin.NewArgs()
+	result := pinyin.Pinyin(s, args)
+	var pinyinStr string
+	for _, py := range result {
+		pinyinStr += py[0]
+	}
+	return pinyinStr
+}
+
+// calculateBestMatch 计算输入与候选列表中的最佳匹配
+func calculateBestMatch(input string, candidates []string) (string, float64) {
+	maxRatio := 0.0
+	var bestMatch string
+	inputPinyin := ConvertToPinyin(input)
+
+	for _, candidate := range candidates {
+		candidatePinyin := ConvertToPinyin(candidate)
+		ratio := strutil.Similarity(inputPinyin, candidatePinyin, metrics.NewLevenshtein())
+		if ratio > maxRatio {
+			maxRatio = ratio
+			bestMatch = candidate
+		}
+	}
+
+	return bestMatch, maxRatio
+}
+
+// MatchProvince 匹配省份
+func MatchProvince(input string) (string, float64) {
+	return calculateBestMatch(input, Provinces)
+}
+
+// MatchCity 匹配市县区
+func MatchCity(input string, province string) (string, float64) {
+	if cities, ok := Cities[province]; ok {
+		city, ratio := calculateBestMatch(input, cities)
+		return city, ratio
+	}
+	return "", 0.0
+}
+
+// FuzzyMatch 模糊匹配省份或城市
+func FuzzyMatch(input string) (string, float64) {
+	// 先匹配省份
+	province, provinceRatio := MatchProvince(input)
+	
+	// 如果省份匹配度较高，直接返回省份结果
+	if provinceRatio > 0.7 {
+		return province, provinceRatio
+	}
+
+	// 否则匹配城市
+	city, cityRatio := MatchCity(input, province)
+	if cityRatio > provinceRatio {
+		return province + " " + city, cityRatio
+	}
+	
+	return province, provinceRatio
+}
 
 // Provinces 包含所有支持的省份列表。
 var Provinces = []string{
@@ -38,7 +105,6 @@ var Provinces = []string{
 	"福建省",
 }
 
-// Cities 包含每个省份对应的城市列表。
 var Cities = map[string][]string{
 	"北京市": {
 		"平谷",
@@ -2385,38 +2451,38 @@ var Cities = map[string][]string{
 
 // Province 省份
 type Province struct {
-	Beijing []string `json:"北京市"`
-	Tianjin []string `json:"天津市"`
-	Shanghai []string `json:"上海市"`
-	Chongqing []string `json:"重庆市"`
-	Hebei []string `json:"河北省"`
-	Shandong []string `json:"山东省"`
-	Zhejiang []string `json:"浙江省"`
-	Sichuan []string `json:"四川省"`
-	Henan []string `json:"河南省"`
-	Liaoning []string `json:"辽宁省"`
-	Jiangsu []string `json:"江苏省"`
-	GangAoTai []string `json:"港澳台"`
-	Anhui []string `json:"安徽省"`
-	Jilin []string `json:"吉林省"`
-	Fujian []string `json:"福建省"`
-	Shanxi []string `json:"山西省"`
-	Hubei []string `json:"湖北省"`
+	Beijing      []string `json:"北京市"`
+	Tianjin      []string `json:"天津市"`
+	Shanghai     []string `json:"上海市"`
+	Chongqing    []string `json:"重庆市"`
+	Hebei        []string `json:"河北省"`
+	Shandong     []string `json:"山东省"`
+	Zhejiang     []string `json:"浙江省"`
+	Sichuan      []string `json:"四川省"`
+	Henan        []string `json:"河南省"`
+	Liaoning     []string `json:"辽宁省"`
+	Jiangsu      []string `json:"江苏省"`
+	GangAoTai    []string `json:"港澳台"`
+	Anhui        []string `json:"安徽省"`
+	Jilin        []string `json:"吉林省"`
+	Fujian       []string `json:"福建省"`
+	Shanxi       []string `json:"山西省"`
+	Hubei        []string `json:"湖北省"`
 	Heilongjiang []string `json:"黑龙江省"`
-	Jiangxi []string `json:"江西省"`
-	Neimenggu []string `json:"内蒙古"`
-	Hunan []string `json:"湖南省"`
-	Xinjiang []string `json:"新疆维吾尔自治区"`
-	Guangdong []string `json:"广东省"`
-	Guizhou []string `json:"贵州省"`
-	Yunnan []string `json:"云南省"`
-	Xizang []string `json:"西藏自治区"`
-	Guangxi []string `json:"广西壮族自治区"`
-	Gansu []string `json:"甘肃省"`
-	Qinghai []string `json:"青海省"`
-	Ningxia []string `json:"宁夏回族自治区"`
-	Hainan []string `json:"海南省"`
-	Shaanxi []string `json:"陕西省"`
+	Jiangxi      []string `json:"江西省"`
+	Neimenggu    []string `json:"内蒙古"`
+	Hunan        []string `json:"湖南省"`
+	Xinjiang     []string `json:"新疆维吾尔自治区"`
+	Guangdong    []string `json:"广东省"`
+	Guizhou      []string `json:"贵州省"`
+	Yunnan       []string `json:"云南省"`
+	Xizang       []string `json:"西藏自治区"`
+	Guangxi      []string `json:"广西壮族自治区"`
+	Gansu        []string `json:"甘肃省"`
+	Qinghai      []string `json:"青海省"`
+	Ningxia      []string `json:"宁夏回族自治区"`
+	Hainan       []string `json:"海南省"`
+	Shaanxi      []string `json:"陕西省"`
 }
 
 // IsValidProvince 检查省份是否有效。

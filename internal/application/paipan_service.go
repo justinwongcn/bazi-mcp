@@ -46,11 +46,19 @@ func (s *BaziAppService) GetBaziPaipan(ctx context.Context, req bazi.Request) (s
 // validateInput 验证输入参数并设置默认值
 func (s *BaziAppService) validateInput(req bazi.Request) (string, bool) {
 	// 1. 输入验证 (省份和城市有效性)
-	if req.Province != "" && !location.IsValidProvince(req.Province) {
-		return fmt.Sprintf("无效省份: %s\n 一般最后面需要带上“省市区”等 例：\"北京市\"", req.Province), true
+	if req.Province != "" {
+		matchedProvince, ratio := location.MatchProvince(req.Province)
+		if ratio < 0.6 {
+			return fmt.Sprintf("无效省份: %s\n 一般最后面需要带上“省市区”等 例：\"北京市\"", req.Province), true
+		}
+		req.Province = matchedProvince
 	}
-	if req.City != "" && !location.IsValidCity(req.Province, req.City) {
-		return fmt.Sprintf("无效城市: %s\n 最后面一般不带上“县市区”等（除非带上后只有两个字）", req.City), true
+	if req.City != "" {
+		matchedCity, ratio := location.MatchCity(req.City, req.Province)
+		if ratio < 0.5 {
+			return fmt.Sprintf("无效城市: %s\n 最后面一般不带上“县市区”等（除非带上后只有两个字）", req.City), true
+		}
+		req.City = matchedCity
 	}
 
 	// 2. 设置默认值 (如果请求中未提供)

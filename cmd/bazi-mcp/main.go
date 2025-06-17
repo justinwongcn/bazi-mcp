@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	
 	"fmt"
 	"log"
 
-	app "github.com/justinwongcn/bazi-mcp/internal/application"
+	application "github.com/justinwongcn/bazi-mcp/internal/application"
 	baziDomain "github.com/justinwongcn/bazi-mcp/internal/domain/bazi"
-	"github.com/justinwongcn/bazi-mcp/internal/domain/location"
+	
 	baziInfra "github.com/justinwongcn/bazi-mcp/internal/infrastructure/bazi"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
@@ -16,117 +16,78 @@ import (
 	"github.com/ThinkInAIXYZ/go-mcp/transport"
 )
 
-func main() {
-	// 1. 初始化依赖
-	apiClient := baziInfra.NewAPIClient() // Infrastructure: API Client
-	// Domain service is implicitly satisfied by APIClient as it implements the interface
-	var baziDomainService baziDomain.Service = apiClient
-	baziAppService := app.NewBaziAppService(baziDomainService) // Application Service
+// 2. 将工具名称定义为领域常量（提升领域概念内聚性）
+const (
+	BaziToolName = "bazi_paipan" // 领域工具名称常量定义
+)
 
-	// 2. 创建 MCP 服务器
+// Init 初始化并启动八字排盘MCP服务器。
+func Init() error {
+	// 1. 初始化依赖
+	baziAppService := setupDependencies()
+
+	// 2. 创建并配置服务器
+	mcpServer, err := createAndConfigureServer(baziAppService)
+	if err != nil {
+		return err
+	}
+
+	// 3. 运行服务器
+	return runServer(mcpServer)
+}
+
+// setupDependencies 初始化应用依赖
+func setupDependencies() *application.BaziAppService {
+	apiClient := baziInfra.NewAPIClient()
+	var baziDomainService baziDomain.Service = apiClient
+	return application.NewBaziAppService(baziDomainService)
+}
+
+// createAndConfigureServer 创建并配置MCP服务器
+func createAndConfigureServer(baziAppService *application.BaziAppService) (*server.Server, error) {
 	transportServer := transport.NewStdioServerTransport()
 	mcpServer, err := server.NewServer(transportServer)
 	if err != nil {
-		log.Fatalf("创建MCP服务器失败: %v", err)
+		return nil, fmt.Errorf("创建MCP服务器失败: %w", err)
 	}
 
-	// 3. 注册资源 (省份和城市)
-	err = registerLocationResources(mcpServer)
-	if err != nil {
-		log.Fatalf("注册资源失败: %v", err)
+	if err := registerAllResources(mcpServer, baziAppService); err != nil {
+		return nil, fmt.Errorf("服务器配置失败: %w", err)
 	}
 
-	// 4. 注册八字排盘工具
-	registerBaziTool(mcpServer, baziAppService)
-
-	// 5. 注册提示词
-	registerPrompts(mcpServer)
-
-	// 5. 运行服务器
-	log.Printf("八字排盘MCP服务器已启动，使用 stdio 模式进行通信\n")
-	if err = mcpServer.Run(); err != nil {
-		log.Fatalf("服务器运行失败: %v", err)
-	}
+	return mcpServer, nil
 }
 
-// registerLocationResources 注册省份和城市相关的 MCP 资源。
-func registerLocationResources(mcpServer *server.Server) error {
-	// 注册所有省份列表的资源
-	provincesResource := &protocol.Resource{
-		URI:         "data://provinces",
-		Name:        "所有支持的省份",
-		Description: "列出所有支持的省份列表",
-		MimeType:    "application/json",
-	}
+// registerAllResources 注册所有资源
+func registerAllResources(mcpServer *server.Server, baziAppService *application.BaziAppService) error {
+	
 
-	mcpServer.RegisterResource(provincesResource, func(ctx context.Context, req *protocol.ReadResourceRequest) (*protocol.ReadResourceResult, error) {
-		// 获取省份列表
-		provinces := location.Provinces
-
-		// 将省份列表转换为JSON
-		provincesJSON, err := json.Marshal(provinces)
-		if err != nil {
-			return nil, fmt.Errorf("序列化省份列表失败: %w", err)
-		}
-
-		return &protocol.ReadResourceResult{
-			Contents: []protocol.ResourceContents{
-				protocol.TextResourceContents{
-					URI:      provincesResource.URI,
-					MimeType: provincesResource.MimeType,
-					Text:     string(provincesJSON),
-				},
-			},
-		}, nil
-	})
-
-	// 注册资源模板，用于查询特定省份的城市列表
-	cityResourceTemplate := &protocol.ResourceTemplate{
-		URITemplate: "data://cities/{province}",
-		Name:        "省份城市列表",
-		Description: "查询特定省份下的城市列表",
-		MimeType:    "application/json",
-	}
-
-	err := mcpServer.RegisterResourceTemplate(cityResourceTemplate, func(ctx context.Context, req *protocol.ReadResourceRequest) (*protocol.ReadResourceResult, error) {
-		province, ok := req.Arguments["province"].(string)
-		if !ok {
-			return nil, fmt.Errorf("未提供省份参数或参数类型不正确")
-		}
-
-		// 查找省份对应的城市列表
-		cities, ok := location.Cities[province]
-		if !ok {
-			return nil, fmt.Errorf("不支持的省份: %s", province)
-		}
-
-		// 将城市列表转换为JSON
-		citiesJSON, err := json.Marshal(cities)
-		if err != nil {
-			return nil, fmt.Errorf("序列化城市列表失败: %w", err)
-		}
-
-		return &protocol.ReadResourceResult{
-			Contents: []protocol.ResourceContents{
-				protocol.TextResourceContents{
-					URI:      req.URI, // 使用请求的URI，因为它包含了具体的省份
-					MimeType: cityResourceTemplate.MimeType,
-					Text:     string(citiesJSON),
-				},
-			},
-		}, nil
-	})
-
-	if err != nil {
-		return fmt.Errorf("注册城市资源模板失败: %w", err)
-	}
-
+	registerBaziTool(mcpServer, baziAppService)
+	registerPrompts(mcpServer)
 	return nil
 }
 
-// registerBaziTool 注册八字排盘工具及其处理程序。
-func registerBaziTool(mcpServer *server.Server, baziAppService *app.BaziAppService) {
-	tool, err := protocol.NewTool("bazi_paipan", "根据生辰八字信息获取排盘结果", baziDomain.Request{})
+// runServer 启动服务器运行
+func runServer(mcpServer *server.Server) error {
+	log.Printf("八字排盘MCP服务器已启动，使用 stdio 模式进行通信\n")
+	if err := mcpServer.Run(); err != nil {
+		return fmt.Errorf("服务器运行失败: %w", err)
+	}
+	return nil
+}
+
+func main() {
+	// 调用 Init 方法启动程序
+	if err := Init(); err != nil {
+		log.Fatalf("程序启动失败: %v", err)
+	}
+}
+
+
+
+// registerBaziTool 注册八字排盘工具及其处理程序
+func registerBaziTool(mcpServer *server.Server, baziAppService *application.BaziAppService) {
+	tool, err := protocol.NewTool(BaziToolName, "根据生辰八字信息获取排盘结果", baziDomain.Request{}) // 使用领域常量
 	if err != nil {
 		log.Fatalf("创建工具失败: %v", err)
 	}
@@ -169,86 +130,16 @@ func registerBaziTool(mcpServer *server.Server, baziAppService *app.BaziAppServi
 	})
 }
 
-// registerPrompts 注册所有提示词
+// 3. 迁移提示词内容到领域层（保持领域知识内聚，明确MCP协议层职责）
 func registerPrompts(mcpServer *server.Server) {
 	// 创建八字排盘提示词
 	baziPrompt := &protocol.Prompt{
 		Name:        "bazi_prompt",
-		Description: "八字排盘系统提示词",
-		Arguments: []protocol.PromptArgument{
-			{
-				Name:        "birth_time",
-				Description: "出生时间，格式：YYYY-MM-DD HH:MM",
-				Required:    true,
-			},
-		},
+		Description: baziDomain.PromptDescription,    // 引用领域层定义的常量
+		Arguments:   baziDomain.GetPromptArguments(), // 使用领域层构造方法
 	}
 
-	// 注册提示词处理函数
 	mcpServer.RegisterPrompt(baziPrompt, func(ctx context.Context, request *protocol.GetPromptRequest) (*protocol.GetPromptResult, error) {
-		return &protocol.GetPromptResult{
-			Description: "八字排盘系统提示",
-			Messages: []protocol.PromptMessage{
-				{
-					Role: protocol.RoleAssistant,
-					Content: protocol.TextContent{
-						Type: "text",
-						Text: `你是一位资深命理师，精通子平八字推命术。请按照以下步骤分析：
-融合子平八字与认知心理学的数字命理师，遵循「数据验证→格局分析→心理映射→解决方案」四步流程
-
-【核心模块】
-===时空校验===
-
-时辰模糊处理：
-23:00-24:59出生者标注「夜子时争议」并询问用户是否要区分早晚子时
-调用NASA太阳时差数据库自动校正（精度±3分钟）
-地域五行匹配： 使用《地理辨正》原理转换：北京（坎宫属水）→ 匹配亥子丑年能量场
-===合冲刑害分析===
-
-天干作用模型： 甲己合土＞乙庚合金＞... ｜ 优先度：合化成功＞合绊＞相克
-地支关系矩阵：
-三刑触发条件：寅巳申需同时出现两个以上
-六害化解方案：子未害建议佩戴水晶（土水通关）
-===日主喜忌系统===
-调用《穷通宝鉴》算法：
-甲木日主：
-必要元素：庚（斧斤）丙（阳光）
-禁忌组合：乙木透干+地支水旺
-庚金日主：
-优化路径：丁火炼金→壬水淬锋→甲木生火
-风险预警：辛金透干引发比劫争财
-
-===解决方案引擎===
-
-五行调节： 「缺庚」→ 申时佩戴钛钢饰品 「丁弱」→ 参加金属锻造体验课
-心理干预： 比劫过旺→MBTI矫正：ENTP→ISTJ平衡训练
-【交互协议】
-
-风险控制：
-所有结论标注置信度（例：财运85%±5）
-极端案例触发建议转接人工心理咨询师
-验证机制：
-提供以往年份重大事件反推验证
-支持生成PDF版《命理分析溯源报告》
-【示例指令逻辑】
-当输入「甲戌 丙子 庚寅 辛巳」：
-
-日主庚金识别 → 检查丁火（时支巳中藏丁）
-寅巳申三刑预警 → 标注2016丙申年危机事件概率
-生成建议：
-五行：每日巳时（9-11点）日光浴补火
-心理：每周三次HIIT训练泄金气 ===
-身体健康：八字中藏丁，宜补火，忌水旺`,
-					},
-				},
-				{
-					Role: protocol.RoleUser,
-					Content: protocol.TextContent{
-						Type: "text",
-						Text: "请结合以下MCP数据源进行深度分析：\n1. 使用《三命通会》的神煞数据验证命局\n2. 参考《渊海子平》的纳音五行表匹配日主特性\n3. 对比MCP时辰数据库中的地区真太阳时差值",
-					},
-				},
-			},
-		}, nil
+		return baziDomain.GeneratePromptContent() // 将具体实现移交领域层
 	})
 }
